@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeLink: Blood Availability &amp; Emergency Donor Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #c62828;
+      --primary-dark: #8e0000;
+      --primary-light: #ef5350;
+      --primary-subtle: #ffebee;
+      --accent: #d32f2f;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --warning: #b45309;
+      --warning-bg: #fef3c7;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(198,40,40,0.08);
+      --shadow-lg: 0 10px 25px -5px rgba(198,40,40,0.12), 0 8px 10px -6px rgba(0,0,0,0.04);
+      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.5;
+      padding-bottom: 40px;
+    }
+
+    /* Container */
+    .app-container {
+      width: 100%;
+      max-width: 520px;
+      padding: 16px;
+      margin: 0 auto;
+    }
+
+    /* Top Brand Header */
+    header.brand-header {
+      width: 100%;
+      background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+      color: #ffffff;
+      padding: 24px 20px 20px;
+      text-align: center;
+      border-bottom-left-radius: var(--radius-lg);
+      border-bottom-right-radius: var(--radius-lg);
+      box-shadow: 0 4px 20px rgba(183, 28, 28, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--primary);
+    }
+
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-tagline {
+      font-size: 0.85rem;
+      color: #ffcdd2;
+      font-weight: 500;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 18px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Auth Nav Pills */
+    .auth-tabs {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 22px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .auth-tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
+    }
+
+    .input-wrapper select {
+      appearance: none;
+      background-image: url("data:image/svg2+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2364748b' viewBox='0 0 20 20'%3E%3Cpath d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+      background-position: right 14px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      cursor: pointer;
+    }
+
+    .input-error-msg {
+      color: var(--danger);
+      font-size: 0.78rem;
+      margin-top: 4px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .has-error input,
+    .has-error select {
+      border-color: var(--danger);
+      background-color: #fffbfa;
+    }
+
+    .has-error .input-error-msg {
+      display: block;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: #475569;
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      width: auto;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.toast-error {
+      background: #991b1b;
+      color: #ffffff;
+    }
+
+    .toast.toast-success {
+      background: #14532d;
+      color: #ffffff;
+    }
+
+    /* Blood Group Pill */
+    .blood-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffcdd2;
+      min-width: 60px;
+    }
+
+    .blood-badge-sm {
+      font-size: 0.85rem;
+      padding: 3px 8px;
+      min-width: 44px;
+      border-width: 1px;
+    }
+
+    /* Dashboard Layout */
+    .dash-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .user-greeting h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .user-greeting p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Availability Toggle Switch */
+    .availability-card {
+      background: linear-gradient(to right, #ffffff, #fffafa);
+      border: 1.5px solid #fee2e2;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .avail-info h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .avail-status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-top: 4px;
+    }
+
+    .status-active {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .status-inactive {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
+    /* Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .slider {
+      background-color: var(--success);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Profile Details Grid */
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+    }
+
+    .profile-detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .detail-val {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      word-break: break-all;
+    }
+
+    /* Search & Filter section */
+    .search-section {
+      margin-top: 8px;
+    }
+
+    .search-inputs {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .search-inputs select,
+    .search-inputs input {
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .search-inputs select {
+      width: 40%;
+    }
+
+    .search-inputs input {
+      width: 60%;
+    }
+
+    /* Donors List */
+    .donor-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .donor-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: border-color 0.2s ease;
+    }
+
+    .donor-card:hover {
+      border-color: #cbd5e1;
+    }
+
+    .donor-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .donor-info h5 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .donor-info p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .donor-contact-btn {
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      border: 1px solid #ffcdd2;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .donor-contact-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* Compatibility Helper Card */
+    .compat-box {
+      background: #fdf2f2;
+      border: 1px dashed #fca5a5;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: #7f1d1d;
+    }
+
+    .compat-box strong {
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 24px;
+    }
+
+    /* Utility */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Brand Sticky Header -->
+  <header class="brand-header">
+    <div class="brand-logo-wrap">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">LifeLink</h1>
+    </div>
+    <p class="brand-tagline">Blood Availability &amp; Emergency Donor Finder</p>
+  </header>
+
+  <div class="app-container">
+
+    <!-- ==================== AUTH VIEW (LOGIN & REGISTER) ==================== -->
+    <div id="authView">
+      <div class="card">
+        <div class="auth-tabs">
+          <button id="tabLoginBtn" class="auth-tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+          <button id="tabRegisterBtn" class="auth-tab-btn" onclick="switchAuthTab('register')">Register as Donor</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+          <div class="form-group" id="loginEmailGroup">
+            <label for="loginEmail">Email Address or Mobile</label>
+            <div class="input-wrapper">
+              <input type="text" id="loginEmail" placeholder="e.g. rahul@example.com" autocomplete="username">
+            </div>
+            <div class="input-error-msg" id="loginEmailError">Please enter your registered email or mobile.</div>
+          </div>
+
+          <div class="form-group" id="loginPassGroup">
+            <label for="loginPassword">Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+            </div>
+            <div class="input-error-msg" id="loginPassError">Please enter your password.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+            Sign In to Dashboard
+          </button>
+
+          <p style="text-align:center; margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+            New volunteer? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register your profile</a>
+          </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="hidden" onsubmit="handleRegister(event)" novalidate>
+          <div class="form-group" id="regNameGroup">
+            <label for="regName">Full Name</label>
+            <div class="input-wrapper">
+              <input type="text" id="regName" placeholder="e.g. Arun Kumar">
+            </div>
+            <div class="input-error-msg" id="regNameError">Name must be at least 2 characters.</div>
+          </div>
+
+          <div class="form-group" id="regEmailGroup">
+            <label for="regEmail">Email Address</label>
+            <div class="input-wrapper">
+              <input type="email" id="regEmail" placeholder="e.g. arun.kumar@gmail.com">
+            </div>
+            <div class="input-error-msg" id="regEmailError">Please enter a valid email address.</div>
+          </div>
+
+          <div class="form-group" id="regPassGroup">
+            <label for="regPassword">Create Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="regPassword" placeholder="Minimum 6 characters">
+            </div>
+            <div class="input-error-msg" id="regPassError">Password must be at least 6 characters long.</div>
+          </div>
+
+          <div class="form-group" id="regMobileGroup">
+            <label for="regMobile">Mobile Number</label>
+            <div class="input-wrapper">
+              <input type="tel" id="regMobile" placeholder="10-digit mobile number">
+            </div>
+            <div class="input-error-msg" id="regMobileError">Enter a valid 10-digit mobile number.</div>
+          </div>
+
+          <div class="form-group" id="regLocationGroup">
+            <label for="regLocation">Location / City</label>
+            <div class="input-wrapper">
+              <input type="text" id="regLocation" placeholder="e.g. Chennai, Tamil Nadu">
+            </div>
+            <div class="input-error-msg" id="regLocationError">Location / City cannot be empty.</div>
+          </div>
+
+          <div class="form-group" id="regBloodGroup">
+            <label for="regBlood">Blood Group</label>
+            <div class="input-wrapper">
+              <select id="regBlood">
+                <option value="">-- Select Blood Group --</option>
+                <option value="A+">A+ (A Positive)</option>
+                <option value="A-">A- (A Negative)</option>
+                <option value="B+">B+ (B Positive)</option>
+                <option value="B-">B- (B Negative)</option>
+                <option value="O+">O+ (O Positive)</option>
+                <option value="O-">O- (O Negative - Universal Donor)</option>
+                <option value="AB+">AB+ (AB Positive - Universal Recipient)</option>
+                <option value="AB-">AB- (AB Negative)</option>
+              </select>
+            </div>
+            <div class="input-error-msg" id="regBloodError">Please choose your blood group.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+            Complete Registration &amp; Sign In
+          </button>
+
+          <p style="text-align:center; margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+            Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color: var(--primary); font-weight: 700; text-decoration: none;">Sign In</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- General Info Card -->
+      <div class="card" style="background: #ffffff; border: 1px solid var(--border);">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
+          Zero-Delay Emergency LifeLink Protocol
+        </h4>
+        <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+          LifeLink bridges emergency patients with nearby willing donors in real time. Register once, toggle your availability whenever ready, and save human lives.
+        </p>
+      </div>
+    </div>
+
+    <!-- ==================== DASHBOARD VIEW ==================== -->
+    <div id="dashboardView" class="hidden">
+      
+      <!-- Top Action Bar -->
+      <div class="dash-header-row">
+        <div class="user-greeting">
+          <p>Welcome back,</p>
+          <h2 id="dashGreetingName">Donor Name</h2>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="handleLogout()" title="Sign Out">
+          Sign Out
+        </button>
+      </div>
+
+      <!-- User Profile & Blood Group Card -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Your Blood Group</span>
+            <div style="margin-top: 4px;">
+              <span id="dashBloodBadge" class="blood-badge">O+</span>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Member ID</span>
+            <div id="dashUserId" style="font-size: 0.85rem; font-weight: 700; color: #475569; margin-top: 4px;">LL-1001</div>
+          </div>
+        </div>
+
+        <div class="profile-details-grid">
+          <div class="profile-detail-item">
+            <span class="detail-label">Full Name</span>
+            <span class="detail-val" id="dashName">--</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="detail-label">City / Location</span>
+            <span class="detail-val" id="dashLocation">--</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="detail-label">Mobile Number</span>
+            <span class="detail-val" id="dashMobile">--</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="detail-label">Registered Email</span>
+            <span class="detail-val" id="dashEmail">--</span>
+          </div>
+        </div>
+
+        <!-- Compatibility Guide for Logged-In User -->
+        <div id="dashCompatibilityBox" class="compat-box">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Availability Status Toggle Card -->
+      <div class="availability-card">
+        <div class="avail-info">
+          <h4>Donor Availability Status</h4>
+          <div id="availStatusTag" class="avail-status-tag status-active">
+            <span>●</span> Ready to Donate
+          </div>
+        </div>
+        <label class="switch" title="Toggle your visibility to patients seeking emergency donors">
+          <input type="checkbox" id="availToggle" onchange="handleAvailabilityChange(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Emergency Donor Finder / Live Registry Search -->
+      <div class="card search-section">
+        <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">
+          Find Active Emergency Donors
+        </h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Search registered volunteers who currently have their availability status set to active.
+        </p>
+
+        <div class="search-inputs">
+          <select id="searchBloodGroup" onchange="renderDonorDirectory()">
+            <option value="ALL">All Blood Groups</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O- (Universal)</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
+          <input type="text" id="searchCityInput" placeholder="Filter by City / Location..." oninput="renderDonorDirectory()">
+        </div>
+
+        <div id="donorListContainer" class="donor-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      LifeLink Emergency Blood Infrastructure &bull; LocalStorage Verified Client
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification element -->
+  <div id="appToast" class="toast"></div>
+
+  <!-- ==================== LOGIC / JAVASCRIPT ==================== -->
+  <script>
+    // LocalStorage Keys
+    const USERS_STORAGE_KEY = 'lifelink_registered_users';
+    const SESSION_STORAGE_KEY = 'lifelink_current_user_email';
+
+    // In-memory references
+    let currentUser = null;
+
+    // Compatibility Matrix Helper
+    const compatibilityRules = {
+      'O-': { canGive: 'All Blood Groups (Universal Donor)', canReceive: 'O-' },
+      'O+': { canGive: 'O+, A+, B+, AB+', canReceive: 'O+, O-' },
+      'A-': { canGive: 'A-, A+, AB-, AB+', canReceive: 'A-, O-' },
+      'A+': { canGive: 'A+, AB+', canReceive: 'A+, A-, O+, O-' },
+      'B-': { canGive: 'B-, B+, AB-, AB+', canReceive: 'B-, O-' },
+      'B+': { canGive: 'B+, AB+', canReceive: 'B+, B-, O+, O-' },
+      'AB-': { canGive: 'AB-, AB+', canReceive: 'AB-, A-, B-, O-' },
+      'AB+': { canGive: 'AB+ only', canReceive: 'All Blood Groups (Universal Recipient)' }
+    };
+
+    // On Load Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Fresh Start: ensure data store exists without pre-populating fake dummy data
+      if (!localStorage.getItem(USERS_STORAGE_KEY)) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify([]));
+      }
+
+      // 2. Check if an active session is saved
+      const savedSessionEmail = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (savedSessionEmail) {
+        const users = getAllUsers();
+        const user = users.find(u => u.email.toLowerCase() === savedSessionEmail.toLowerCase());
+        if (user) {
+          currentUser = user;
+          showDashboard();
+          return;
+        }
+      }
+
+      // Default: show auth view
+      showAuth();
+    });
+
+    // Storage Helpers
+    function getAllUsers() {
+      try {
+        const raw = localStorage.getItem(USERS_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveAllUsers(users) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    // View Switching
+    function showAuth() {
+      document.getElementById('authView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      switchAuthTab('login');
+    }
+
+    function showDashboard() {
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      populateDashboard();
+    }
+
+    function switchAuthTab(tab) {
+      const loginBtn = document.getElementById('tabLoginBtn');
+      const regBtn = document.getElementById('tabRegisterBtn');
+      const loginForm = document.getElementById('loginForm');
+      const regForm = document.getElementById('registerForm');
+
+      clearFormErrors();
+
+      if (tab === 'login') {
+        loginBtn.classList.add('active');
+        regBtn.classList.remove('active');
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+      } else {
+        loginBtn.classList.remove('active');
+        regBtn.classList.add('active');
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+      }
+    }
+
+    function clearFormErrors() {
+      const errorGroups = document.querySelectorAll('.has-error');
+      errorGroups.forEach(el => el.classList.remove('has-error'));
+    }
+
+    // Toast Messenger
+    let toastTimeout;
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('appToast');
+      toast.textContent = message;
+      toast.className = 'toast show';
+      if (type === 'error') toast.classList.add('toast-error');
+      if (type === 'success') toast.classList.add('toast-success');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.className = 'toast';
+      }, 3500);
+    }
+
+    // Registration Handler
+    function handleRegister(event) {
+      event.preventDefault();
+      clearFormErrors();
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const mobile = document.getElementById('regMobile').value.trim();
+      const location = document.getElementById('regLocation').value.trim();
+      const bloodGroup = document.getElementById('regBlood').value;
+
+      let hasError = false;
+
+      // Validation Rules
+      if (name.length < 2) {
+        document.getElementById('regNameGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        document.getElementById('regEmailGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (password.length < 6) {
+        document.getElementById('regPassGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      const cleanMobile = mobile.replace(/[^0-9]/g, '');
+      if (cleanMobile.length < 10) {
+        document.getElementById('regMobileGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (location.length === 0) {
+        document.getElementById('regLocationGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (!bloodGroup) {
+        document.getElementById('regBloodGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (hasError) {
+        showToast('Please correct the highlighted form errors.', 'error');
+        return;
+      }
+
+      // Check if user already exists
+      const users = getAllUsers();
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) {
+        document.getElementById('regEmailGroup').classList.add('has-error');
+        document.getElementById('regEmailError').textContent = 'An account with this email already exists.';
+        showToast('Email address already registered.', 'error');
+        return;
+      }
+
+      // Create new donor object
+      const newUser = {
+        id: 'LL-' + (1000 + users.length + 1),
+        fullName: name,
+        email: email,
+        password: password, // client-side simulation
+        mobile: cleanMobile,
+        location: location,
+        bloodGroup: bloodGroup,
+        isAvailable: true,
+        registeredAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      saveAllUsers(users);
+
+      // Establish session
+      localStorage.setItem(SESSION_STORAGE_KEY, newUser.email);
+      currentUser = newUser;
+
+      // Reset form
+      document.getElementById('registerForm').reset();
+      showToast('Registration successful! Welcome to LifeLink.', 'success');
+      showDashboard();
+    }
+
+    // Login Handler
+    function handleLogin(event) {
+      event.preventDefault();
+      clearFormErrors();
+
+      const idOrEmail = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      let hasError = false;
+
+      if (!idOrEmail) {
+        document.getElementById('loginEmailGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (!password) {
+        document.getElementById('loginPassGroup').classList.add('has-error');
+        hasError = true;
+      }
+
+      if (hasError) {
+        showToast('Please provide both credentials to sign in.', 'error');
+        return;
+      }
+
+      const users = getAllUsers();
+      const cleanInput = idOrEmail.toLowerCase();
+      const user = users.find(u =>
+        u.email.toLowerCase() === cleanInput ||
+        u.mobile === idOrEmail.replace(/[^0-9]/g, '')
+      );
+
+      if (!user || user.password !== password) {
+        document.getElementById('loginEmailGroup').classList.add('has-error');
+        document.getElementById('loginPassGroup').classList.add('has-error');
+        document.getElementById('loginPassError').textContent = 'Incorrect credentials. Please verify your details.';
+        showToast('Invalid email/mobile or password.', 'error');
+        return;
+      }
+
+      // Session Set
+      localStorage.setItem(SESSION_STORAGE_KEY, user.email);
+      currentUser = user;
+
+      // Reset
+      document.getElementById('loginForm').reset();
+      showToast('Signed in successfully!', 'success');
+      showDashboard();
+    }
+
+    // Logout Handler
+    function handleLogout() {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      currentUser = null;
+      showToast('You have been logged out securely.', 'info');
+      showAuth();
+    }
+
+    // Populate Dashboard Data
+    function populateDashboard() {
+      if (!currentUser) return;
+
+      document.getElementById('dashGreetingName').textContent = currentUser.fullName;
+      document.getElementById('dashName').textContent = currentUser.fullName;
+      document.getElementById('dashEmail').textContent = currentUser.email;
+      document.getElementById('dashMobile').textContent = currentUser.mobile;
+      document.getElementById('dashLocation').textContent = currentUser.location;
+      document.getElementById('dashBloodBadge').textContent = currentUser.bloodGroup;
+      document.getElementById('dashUserId').textContent = currentUser.id || 'LL-DONOR';
+
+      // Set availability checkbox
+      const toggle = document.getElementById('availToggle');
+      toggle.checked = currentUser.isAvailable !== false;
+      updateAvailabilityUI(toggle.checked);
+
+      // Populate compatibility guide
+      const rule = compatibilityRules[currentUser.bloodGroup];
+      const compatBox = document.getElementById('dashCompatibilityBox');
+      if (rule) {
+        compatBox.innerHTML = `
+          <strong>🩸 Medical Transfusion Compatibility:</strong>
+          <span>• <strong>Can donate to:</strong> ${rule.canGive}</span><br>
+          <span>• <strong>Can receive from:</strong> ${rule.canReceive}</span>
+        `;
+      } else {
+        compatBox.innerHTML = `<strong>Standard Blood Group compatibility guidelines apply.</strong>`;
+      }
+
+      // Render search donor directory
+      renderDonorDirectory();
+    }
+
+    // Availability Toggle Handler
+    function handleAvailabilityChange(isAvailable) {
+      if (!currentUser) return;
+
+      currentUser.isAvailable = isAvailable;
+
+      // Update in storage
+      const users = getAllUsers();
+      const idx = users.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+      if (idx !== -1) {
+        users[idx].isAvailable = isAvailable;
+        saveAllUsers(users);
+      }
+
+      updateAvailabilityUI(isAvailable);
+      renderDonorDirectory();
+
+      showToast(
+        isAvailable
+          ? 'Your donor status is now ACTIVE and visible to patients.'
+          : 'Your donor status is now INACTIVE.',
+        isAvailable ? 'success' : 'info'
+      );
+    }
+
+    function updateAvailabilityUI(isAvailable) {
+      const tag = document.getElementById('availStatusTag');
+      if (isAvailable) {
+        tag.className = 'avail-status-tag status-active';
+        tag.innerHTML = '<span>●</span> Ready to Donate';
+      } else {
+        tag.className = 'avail-status-tag status-inactive';
+        tag.innerHTML = '<span>○</span> Temporarily Unavailable';
+      }
+    }
+
+    // Render Emergency Donor Directory
+    function renderDonorDirectory() {
+      const container = document.getElementById('donorListContainer');
+      const bloodFilter = document.getElementById('searchBloodGroup').value;
+      const cityFilter = document.getElementById('searchCityInput').value.trim().toLowerCase();
+
+      const users = getAllUsers();
+
+      // Filter: only show active donors
+      const donors = users.filter(u => {
+        // Must be available
+        if (u.isAvailable === false) return false;
+
+        // Blood filter
+        if (bloodFilter !== 'ALL' && u.bloodGroup !== bloodFilter) return false;
+
+        // City filter
+        if (cityFilter && !u.location.toLowerCase().includes(cityFilter)) return false;
+
+        return true;
+      });
+
+      if (donors.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg style="width:36px; height:36px; fill:#cbd5e1; margin-bottom:6px;" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <p>No active donors found matching your criteria.</p>
+            <p style="font-size: 0.76rem; color: #94a3b8; margin-top:2px;">Try selecting another blood group or clearing the location filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = donors.map(d => {
+        const isSelf = currentUser && d.email.toLowerCase() === currentUser.email.toLowerCase();
+        return `
+          <div class="donor-card">
+            <div class="donor-meta">
+              <span class="blood-badge blood-badge-sm">${escapeHtml(d.bloodGroup)}</span>
+              <div class="donor-info">
+                <h5>${escapeHtml(d.fullName)} ${isSelf ? '<span style="font-size:0.7rem; color:var(--primary); font-weight:700;">(You)</span>' : ''}</h5>
+                <p>📍 ${escapeHtml(d.location)} &bull; ID: ${escapeHtml(d.id || 'LL')}</p>
+              </div>
+            </div>
+            <div>
+              <a href="tel:${escapeHtml(d.mobile)}" class="donor-contact-btn" title="Contact ${escapeHtml(d.fullName)}">
+                📞 Call
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Helper sanitization
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
